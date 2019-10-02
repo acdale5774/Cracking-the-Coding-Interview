@@ -21,13 +21,24 @@ let explode s =
     if i < 0 then l else exp (i - 1) (s.[i] :: l) in
   exp (String.length s - 1) [];;
 
-let rec temp c r orig =
+let implode c_l =
+    let buf = Buffer.create 16 in
+        List.iter (Buffer.add_char buf) c_l;
+        Buffer.contents buf;;
+
+let rec getStringList c_ll =
+    match c_ll with
+        [] -> []
+        | h::t -> [implode h] @ getStringList t;;
+
+let rec permInner c r orig =
     match r with
         [] -> [c]
         | h::t -> if r = orig
             then
-                temp (c@[h]) (rotate1 t) t
+                permInner (c@[h]) (rotate1 t) t
             else
-                temp (c@[h]) (rotate1 t) t @ temp c (rotate1 r) orig;;
+                permInner (c@[h]) (rotate1 t) t 
+                    @ permInner c (rotate1 r) orig;;
 
-let perm s = temp [] (rotate1 (explode s)) (explode s);;
+let perm s = getStringList (permInner [] (rotate1 (explode s)) (explode s));;
